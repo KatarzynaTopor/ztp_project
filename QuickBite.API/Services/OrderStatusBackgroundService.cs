@@ -22,7 +22,7 @@ public class OrderStatusBackgroundService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("OrderStatusBackgroundService uruchomiony.");
+        _logger.LogInformation("OrderStatusBackgroundService started.");
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -32,7 +32,7 @@ public class OrderStatusBackgroundService : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Błąd podczas przetwarzania zamówień w tle.");
+                _logger.LogError(ex, "Error processing stale orders in background.");
             }
 
             await Task.Delay(CheckInterval, stoppingToken);
@@ -47,7 +47,6 @@ public class OrderStatusBackgroundService : BackgroundService
         var now = DateTime.UtcNow;
         var changed = false;
 
-        // Auto-odrzuć zamówienia Pending starsze niż PendingTimeout
         var stalePending = await db.Orders
             .Where(o => o.Status == OrderStatus.Pending && o.UpdatedAt < now - PendingTimeout)
             .ToListAsync(ct);
@@ -56,11 +55,10 @@ public class OrderStatusBackgroundService : BackgroundService
         {
             order.Status = OrderStatus.Rejected;
             order.UpdatedAt = now;
-            _logger.LogInformation("Auto-odrzucono zamówienie {OrderId} (brak odpowiedzi restauracji).", order.Id);
+            _logger.LogInformation("Auto-rejected stale order {OrderId} (restaurant did not respond).", order.Id);
             changed = true;
         }
 
-        // Auto-dostarcz zamówienia OutForDelivery starsze niż DeliveryTimeout
         var staleDelivery = await db.Orders
             .Where(o => o.Status == OrderStatus.OutForDelivery && o.UpdatedAt < now - DeliveryTimeout)
             .ToListAsync(ct);
@@ -69,7 +67,7 @@ public class OrderStatusBackgroundService : BackgroundService
         {
             order.Status = OrderStatus.Delivered;
             order.UpdatedAt = now;
-            _logger.LogInformation("Auto-dostarczono zamówienie {OrderId} (upłynął czas dostawy).", order.Id);
+            _logger.LogInformation("Auto-delivered order {OrderId} (delivery timeout elapsed).", order.Id);
             changed = true;
         }
 
