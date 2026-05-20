@@ -10,7 +10,4 @@ services:
       - ASPNETCORE_URLS=http://+:8080
       - ConnectionStrings__DefaultConnection=Data Source=/app/data/quickbite.db
     volumes:
-      - quickbite-data:/app/data
-
-volumes:
-  quickbite-data:
+      - ./data:/app/data
