@@ -1,1 +1,14 @@
 data/
+
+# .NET
+[Bb]in/
+[Oo]bj/
+
+# SQLite
+*.db
+*.db-shm
+*.db-wal
+
+# macOS
+.DS_Store
+**/.DS_Store
