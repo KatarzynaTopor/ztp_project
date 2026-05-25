@@ -68,6 +68,10 @@ public class OrdersController : ControllerBase
             await _db.SaveChangesAsync();
             return Ok(new { order.Id, Status = order.Status.ToString(), order.UpdatedAt });
         }
+        catch (UnauthorizedAccessException ex)
+        {
+            return StatusCode(403, new { error = ex.Message });
+        }
         catch (InvalidOperationException ex)
         {
             return BadRequest(new { error = ex.Message });

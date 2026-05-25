@@ -36,9 +36,15 @@ public class OrderStateMachine : IOrderStateMachine
 
     public OrderStatus Transition(Order order, OrderStatus to, UserRole actorRole)
     {
-        if (!CanTransition(order.Status, to, actorRole))
+        var transitionExists = AllowedTransitions.ContainsKey((order.Status, to));
+
+        if (!transitionExists)
             throw new InvalidOperationException(
-                $"Przejście z {order.Status} do {to} jest niedozwolone dla roli {actorRole}.");
+                $"Transition from {order.Status} to {to} does not exist.");
+
+        if (!CanTransition(order.Status, to, actorRole))
+            throw new UnauthorizedAccessException(
+                $"Role {actorRole} is not allowed to transition from {order.Status} to {to}.");
 
         order.Status = to;
         order.UpdatedAt = DateTime.UtcNow;
