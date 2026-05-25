@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using QuickBite.API.DTOs;
@@ -55,6 +57,24 @@ public class AuthController : ControllerBase
             return Unauthorized("Nieprawidłowe dane logowania.");
 
         return Ok(BuildResponse(user));
+    }
+
+    /// <summary>Returns the currently authenticated user's profile.</summary>
+    [HttpGet("me")]
+    [Authorize]
+    public async Task<IActionResult> Me()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var user = await _userManager.FindByIdAsync(userId!);
+        if (user is null) return Unauthorized();
+
+        return Ok(new
+        {
+            user.Id,
+            user.Email,
+            user.FullName,
+            Role = user.Role.ToString()
+        });
     }
 
     private AuthResponseDto BuildResponse(ApplicationUser user)
