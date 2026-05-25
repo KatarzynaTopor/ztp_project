@@ -64,7 +64,7 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "QuickBite API",
         Version = "v1",
-        Description = "Backend dla platformy dostaw jedzenia — QuickBite"
+        Description = "Backend dla platformy dostaw jedzenia - QuickBite"
     });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -91,11 +91,18 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// --- Automatyczne migracje przy starcie (dev) ---
+// --- Migracje + seed ról przy starcie ---
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.EnsureCreated();
+    db.Database.Migrate();
+
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    foreach (var role in Enum.GetNames<UserRole>())
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+            await roleManager.CreateAsync(new IdentityRole(role));
+    }
 }
 
 if (app.Environment.IsDevelopment())
