@@ -2,13 +2,6 @@
 
 Backend REST API for a food delivery platform — ZTP group project.
 
-## Team
-
-| # | Name | Role |
-|---|------|------|
-| 1 | Wiktor Wiecheć | Cart, pricing, Strategy pattern, order placement |
-| 2 | Klaudia Szostek | Database, EF Core, migrations, restaurant/menu CRUD |
-| 3 | Katarzyna Topor | Auth (Identity + JWT), order state machine, background service |
 
 ## Requirements
 

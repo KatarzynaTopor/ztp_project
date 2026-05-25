@@ -41,6 +41,15 @@ public class AuthController : ControllerBase
         if (!result.Succeeded)
             return BadRequest(result.Errors);
 
+        // Przypisz użytkownika do roli Identity, żeby działały atrybuty [Authorize(Roles = "...")].
+        // Role są seedowane w Program.cs przy starcie aplikacji.
+        var roleResult = await _userManager.AddToRoleAsync(user, dto.Role.ToString());
+        if (!roleResult.Succeeded)
+        {
+            await _userManager.DeleteAsync(user);
+            return BadRequest(roleResult.Errors);
+        }
+
         return Ok(BuildResponse(user));
     }
 
