@@ -25,9 +25,9 @@ public class TokenServiceTests
 
     private static ApplicationUser MakeUser(UserRole role = UserRole.Customer) => new()
     {
-        Id = "user-123",
-        Email = "test@quickbite.com",
-        FullName = "Test User",
+        Id = "blablabla",
+        Email = "blabla@lalala.com",
+        FullName = "blabla lala",
         Role = role
     };
 
@@ -42,7 +42,6 @@ public class TokenServiceTests
     public void GenerateToken_ReturnsValidJwtFormat()
     {
         var token = _sut.GenerateToken(MakeUser());
-        // JWT has 3 parts separated by dots
         Assert.Equal(3, token.Split('.').Length);
     }
 
@@ -51,7 +50,7 @@ public class TokenServiceTests
     {
         var token = _sut.GenerateToken(MakeUser());
         var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
-        Assert.Contains(jwt.Claims, c => c.Type == JwtRegisteredClaimNames.Email && c.Value == "test@quickbite.com");
+        Assert.Contains(jwt.Claims, c => c.Type == JwtRegisteredClaimNames.Email && c.Value == "blabla@lalala.com");
     }
 
     [Fact]
@@ -59,7 +58,7 @@ public class TokenServiceTests
     {
         var token = _sut.GenerateToken(MakeUser());
         var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
-        Assert.Contains(jwt.Claims, c => c.Type == JwtRegisteredClaimNames.Sub && c.Value == "user-123");
+        Assert.Contains(jwt.Claims, c => c.Type == JwtRegisteredClaimNames.Sub && c.Value == "blablabla");
     }
 
     [Theory]
@@ -78,7 +77,7 @@ public class TokenServiceTests
     {
         var token = _sut.GenerateToken(MakeUser());
         var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
-        Assert.Contains(jwt.Claims, c => c.Type == "fullName" && c.Value == "Test User");
+        Assert.Contains(jwt.Claims, c => c.Type == "fullName" && c.Value == "blabla lala");
     }
 
     [Fact]
@@ -104,7 +103,6 @@ public class TokenServiceTests
         var user = MakeUser();
         var token1 = _sut.GenerateToken(user);
         var token2 = _sut.GenerateToken(user);
-        // jti (unique ID) ensures tokens differ even for same user
         Assert.NotEqual(token1, token2);
     }
 }
