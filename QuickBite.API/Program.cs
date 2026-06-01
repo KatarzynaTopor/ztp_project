@@ -7,6 +7,7 @@ using Microsoft.OpenApi.Models;
 using QuickBite.API.Data;
 using QuickBite.API.Models;
 using QuickBite.API.Services;
+using QuickBite.API.Services.Pricing;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,6 +54,7 @@ builder.Services.AddAuthorization();
 // --- Usługi ---
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IOrderStateMachine, OrderStateMachine>();
+builder.Services.AddScoped<IPricingStrategyFactory, PricingStrategyFactory>();
 builder.Services.AddHostedService<OrderStatusBackgroundService>();
 
 // --- MVC + Swagger ---
