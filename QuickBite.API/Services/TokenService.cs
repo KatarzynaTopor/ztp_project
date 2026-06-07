@@ -29,13 +29,13 @@ public class TokenService : ITokenService
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
-        var expiresInHours = int.Parse(_config["Jwt:ExpiresInHours"] ?? "24");
+        var expiresInMinutes = int.Parse(_config["Jwt:ExpiresInMinutes"] ?? "120");
 
         var token = new JwtSecurityToken(
             issuer: _config["Jwt:Issuer"],
             audience: _config["Jwt:Audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(expiresInHours),
+            expires: DateTime.UtcNow.AddMinutes(expiresInMinutes),
             signingCredentials: creds
         );
 

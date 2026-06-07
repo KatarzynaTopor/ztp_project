@@ -15,14 +15,17 @@ public class AuthController : ControllerBase
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly ITokenService _tokenService;
+    private readonly IConfiguration _config;
 
     public AuthController(UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
-        ITokenService tokenService)
+        ITokenService tokenService,
+        IConfiguration config)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _tokenService = tokenService;
+        _config = config;
     }
 
     /// <summary>Rejestracja nowego użytkownika (Customer, Restaurant lub Courier).</summary>
@@ -88,7 +91,8 @@ public class AuthController : ControllerBase
 
     private AuthResponseDto BuildResponse(ApplicationUser user)
     {
-        var expiresAt = DateTime.UtcNow.AddHours(24);
+        var expiresInMinutes = int.Parse(_config["Jwt:ExpiresInMinutes"] ?? "120");
+        var expiresAt = DateTime.UtcNow.AddMinutes(expiresInMinutes);
         return new AuthResponseDto
         {
             Token = _tokenService.GenerateToken(user),
