@@ -19,7 +19,7 @@ public class TokenServiceTests
         config.Setup(c => c["Jwt:Key"]).Returns(TestKey);
         config.Setup(c => c["Jwt:Issuer"]).Returns("TestIssuer");
         config.Setup(c => c["Jwt:Audience"]).Returns("TestAudience");
-        config.Setup(c => c["Jwt:ExpiresInHours"]).Returns("24");
+        config.Setup(c => c["Jwt:ExpiresInMinutes"]).Returns("2");
         _sut = new TokenService(config.Object);
     }
 
@@ -81,12 +81,12 @@ public class TokenServiceTests
     }
 
     [Fact]
-    public void GenerateToken_ExpiresInApproximately24Hours()
+    public void GenerateToken_ExpiresAccordingToConfig()
     {
         var token = _sut.GenerateToken(MakeUser());
         var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
-        var expectedExpiry = DateTime.UtcNow.AddHours(24);
-        Assert.True(Math.Abs((jwt.ValidTo - expectedExpiry).TotalMinutes) < 2);
+        var expectedExpiry = DateTime.UtcNow.AddMinutes(2);
+        Assert.True(Math.Abs((jwt.ValidTo - expectedExpiry).TotalSeconds) < 10);
     }
 
     [Fact]

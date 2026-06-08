@@ -15,7 +15,6 @@ public class OrderStateMachineTests
         Status = status
     };
 
-    // --- CanTransition: valid ---
 
     [Theory]
     [InlineData(OrderStatus.Pending,        OrderStatus.Accepted,       UserRole.Restaurant)]
@@ -31,7 +30,6 @@ public class OrderStateMachineTests
         Assert.True(_sut.CanTransition(from, to, role));
     }
 
-    // --- CanTransition: wrong role ---
 
     [Theory]
     [InlineData(OrderStatus.Pending,        OrderStatus.Accepted,       UserRole.Customer)]
@@ -47,7 +45,6 @@ public class OrderStateMachineTests
         Assert.False(_sut.CanTransition(from, to, role));
     }
 
-    // --- CanTransition: nonexistent transition ---
 
     [Theory]
     [InlineData(OrderStatus.Delivered,  OrderStatus.Pending,       UserRole.Restaurant)]
@@ -59,7 +56,6 @@ public class OrderStateMachineTests
         Assert.False(_sut.CanTransition(from, to, role));
     }
 
-    // --- Transition: happy path ---
 
     [Fact]
     public void Transition_ValidTransition_UpdatesStatus()
@@ -92,7 +88,6 @@ public class OrderStateMachineTests
         Assert.Equal(OrderStatus.Delivered, order.Status);
     }
 
-    // --- Transition: role mismatch → 403 (UnauthorizedAccessException) ---
 
     [Fact]
     public void Transition_WrongRole_ThrowsUnauthorizedAccessException()
@@ -110,7 +105,6 @@ public class OrderStateMachineTests
         Assert.Equal(OrderStatus.Pending, order.Status);
     }
 
-    // --- Transition: nonexistent transition → 400 (InvalidOperationException) ---
 
     [Fact]
     public void Transition_NonexistentTransition_ThrowsInvalidOperationException()
@@ -123,13 +117,11 @@ public class OrderStateMachineTests
     [Fact]
     public void Transition_RoleVsStateMismatch_RoleExceptionTakesPrecedence()
     {
-        // Transition (Pending → Accepted) exists but Customer can't do it → UnauthorizedAccessException, not InvalidOperation
         var order = NewOrder(OrderStatus.Pending);
         Assert.Throws<UnauthorizedAccessException>(() =>
             _sut.Transition(order, OrderStatus.Accepted, UserRole.Customer));
     }
 
-    // --- Customer cancel paths ---
 
     [Fact]
     public void Transition_CustomerCancelsPending_Succeeds()
